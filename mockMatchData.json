@@ -1,0 +1,21 @@
+{
+  "matchInfo": "Gujarat Titans vs Chennai Super Kings — IPL 2026, Match 66, Narendra Modi Stadium",
+  "innings": "2nd",
+  "battingTeam": "Chennai Super Kings",
+  "bowlingTeam": "Gujarat Titans",
+  "target": 199,
+  "score": "162/4",
+  "overs": "16.4",
+  "currentRunRate": 9.72,
+  "requiredRunRate": 11.10,
+  "runsNeeded": 37,
+  "ballsRemaining": 20,
+  "lastEvent": "WICKET — Ruturaj Gaikwad c deep midwicket b Rashid Khan 58(34)",
+  "currentBatters": [
+    { "name": "MS Dhoni", "runs": 12, "balls": 7, "strikeRate": 171.4 },
+    { "name": "Ravindra Jadeja", "runs": 28, "balls": 19, "strikeRate": 147.4 }
+  ],
+  "currentBowler": { "name": "Rashid Khan", "overs": "3.4", "runs": 31, "wickets": 2, "economy": 8.45 },
+  "lastFiveOvers": [9, 14, 7, 18, 11],
+  "partnership": "9 (5)"
+}
