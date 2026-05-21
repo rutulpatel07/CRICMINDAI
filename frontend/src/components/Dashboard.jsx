@@ -72,17 +72,19 @@ const SectionHead = ({ children }) => (
 const Divider = () => <div style={{ height: 1, background: T.border, margin: '12px 0' }} />;
 
 /* ── Win Probability Bar ────────────────────────────────────────── */
-function WinBar({ gt, csk }) {
+function WinBar({ gt, csk, homeTeam, awayTeam }) {
+  const h = homeTeam ? homeTeam.split(' ').map(w => w[0]).join('') : 'GT';
+  const a = awayTeam ? awayTeam.split(' ').map(w => w[0]).join('') : 'CSK';
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: T.blue, display: 'inline-block' }} />
-          <span style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 14, color: T.blue }}>GT &nbsp;{gt}%</span>
+          <span style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 14, color: T.blue }}>{h} &nbsp;{gt}%</span>
         </div>
         <span style={{ fontFamily: "'Inter',sans-serif", fontSize: 11, color: T.txtMute }}>Win Probability</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 14, color: T.orange }}>{csk}%&nbsp; CSK</span>
+          <span style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 14, color: T.orange }}>{csk}%&nbsp; {a}</span>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: T.orange, display: 'inline-block' }} />
         </div>
       </div>
@@ -450,6 +452,14 @@ function BallDots({ overs }) {
   );
 }
 
+const CHAT_SUGGESTIONS = [
+  "Can CSK still win this?",
+  "Who should bowl the next over?",
+  "What's CSK's only path to victory?",
+  "How many sixes does CSK need per over?",
+  "Is this chase mathematically possible?",
+];
+
 /* ═══ MAIN DASHBOARD ════════════════════════════════════════════════ */
 export default function Dashboard() {
   const [liveData, setLiveData]         = useState(null);
@@ -462,8 +472,12 @@ export default function Dashboard() {
   const [imageFile, setImageFile]       = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [activeTab, setActiveTab]       = useState('match');
+  const [chatInput, setChatInput]       = useState('');
+  const [chatHistory, setChatHistory]   = useState([]);
+  const [chatLoading, setChatLoading]   = useState(false);
   const consoleEnd = useRef(null);
   const fileRef    = useRef(null);
+  const chatEnd    = useRef(null);
 
   const fetchLive = async () => {
     try {
@@ -511,6 +525,30 @@ export default function Dashboard() {
       setDataSource('local_mock');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const sendChat = async (question) => {
+    const q = (question || chatInput).trim();
+    if (!q || chatLoading) return;
+    setChatInput('');
+    setChatHistory(h => [...h, { role: 'user', text: q }]);
+    setChatLoading(true);
+    setTimeout(() => chatEnd.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+    try {
+      const res = await fetch('http://localhost:5000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q }),
+      });
+      const json = await res.json();
+      const answer = json.success ? json.answer : "Sorry, I couldn't fetch an answer right now. Try again!";
+      setChatHistory(h => [...h, { role: 'ai', text: answer }]);
+    } catch {
+      setChatHistory(h => [...h, { role: 'ai', text: "Connection error — make sure the backend is running." }]);
+    } finally {
+      setChatLoading(false);
+      setTimeout(() => chatEnd.current?.scrollIntoView({ behavior: 'smooth' }), 50);
     }
   };
 
@@ -685,10 +723,26 @@ export default function Dashboard() {
               ))}
             </div>
 
+            {/* 2nd innings target banner */}
+            {d?.liveScore?.target && (
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                {[
+                  { label: 'Target', value: d.liveScore.target, color: T.red },
+                  { label: 'Need', value: `${d.liveScore.runsNeeded} off ${Math.round(d.liveScore.oversRemaining * 6)} balls`, color: T.red },
+                  { label: 'RRR', value: rr?.required?.toFixed(2), color: rr?.required > 12 ? T.red : T.orange },
+                ].map((s, i) => (
+                  <div key={i} style={{ padding: '8px 18px', borderRadius: 8, background: T.redLt, border: `1px solid ${T.red}30`, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <span style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 22, color: s.color, lineHeight: 1 }}>{s.value}</span>
+                    <span style={{ fontFamily: "'Inter',sans-serif", fontSize: 10, color: T.txtMute, marginTop: 3, textTransform: 'uppercase', letterSpacing: 1 }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* win probability + situation */}
             {wp && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <WinBar gt={wp.gujaratTitans} csk={wp.chennaiSuperKings} />
+                <WinBar gt={wp.gujaratTitans} csk={wp.chennaiSuperKings} homeTeam={d?.matchInfo?.teams?.home} awayTeam={d?.matchInfo?.teams?.away} />
                 <SituationBadge wp={wp} runRate={rr} score={score} />
               </div>
             )}
@@ -903,6 +957,109 @@ export default function Dashboard() {
                 </p>
               </div>
             )}
+
+            {/* ── ASK CRICMIND CHAT ────────────────────────────────── */}
+            <div style={{ background: T.bgCard, borderRadius: 16, border: `1px solid ${T.border}`, overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}>
+              <div style={{ height: 3, background: `linear-gradient(90deg, ${T.blue}, ${T.purple}, ${T.orange})` }} />
+              <div style={{ padding: '24px 24px 20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${T.blue}, ${T.purple})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>💬</div>
+                  <div>
+                    <div style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 18, color: T.txtDark, letterSpacing: 0.3 }}>Ask CricMind</div>
+                    <div style={{ fontFamily: "'Inter',sans-serif", fontSize: 12, color: T.txtMute }}>Ask anything about the live match — Gemini answers with real data</div>
+                  </div>
+                </div>
+
+                {/* chat history */}
+                {chatHistory.length > 0 && (
+                  <div style={{ background: T.bgMuted, borderRadius: 10, padding: '14px', marginBottom: 14, maxHeight: 280, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, border: `1px solid ${T.border}` }}>
+                    {chatHistory.map((msg, i) => (
+                      <div key={i} style={{
+                        display: 'flex', gap: 10, flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
+                        animation: 'slideUp 0.25s ease-out both',
+                      }}>
+                        <div style={{
+                          width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                          background: msg.role === 'user' ? T.orange : `linear-gradient(135deg, ${T.blue}, ${T.purple})`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 12, color: '#fff', fontWeight: 700, fontFamily: "'Rajdhani',sans-serif",
+                        }}>{msg.role === 'user' ? 'U' : 'AI'}</div>
+                        <div style={{
+                          maxWidth: '78%', padding: '10px 14px', borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px',
+                          background: msg.role === 'user' ? T.orangeLt : T.bgCard,
+                          border: `1px solid ${msg.role === 'user' ? T.orange + '40' : T.border}`,
+                          fontFamily: "'Inter',sans-serif", fontSize: 13, lineHeight: 1.6,
+                          color: T.txtDark,
+                        }}>{msg.text}</div>
+                      </div>
+                    ))}
+                    {chatLoading && (
+                      <div style={{ display: 'flex', gap: 10, animation: 'slideUp 0.2s ease-out both' }}>
+                        <div style={{ width: 28, height: 28, borderRadius: '50%', background: `linear-gradient(135deg, ${T.blue}, ${T.purple})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#fff', fontWeight: 700, fontFamily: "'Rajdhani',sans-serif", flexShrink: 0 }}>AI</div>
+                        <div style={{ padding: '10px 16px', borderRadius: '4px 12px 12px 12px', background: T.bgCard, border: `1px solid ${T.border}`, display: 'flex', gap: 5, alignItems: 'center' }}>
+                          {[0, 1, 2].map(j => <span key={j} style={{ width: 7, height: 7, borderRadius: '50%', background: T.blue, display: 'inline-block', animation: `dotBounce 1s ${j * 0.18}s infinite` }} />)}
+                        </div>
+                      </div>
+                    )}
+                    <div ref={chatEnd} />
+                  </div>
+                )}
+
+                {/* suggestion chips */}
+                {chatHistory.length === 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
+                    {CHAT_SUGGESTIONS.map((s, i) => (
+                      <button key={i} onClick={() => sendChat(s)} style={{
+                        padding: '6px 14px', borderRadius: 20,
+                        background: T.bgMuted, border: `1px solid ${T.border}`,
+                        fontFamily: "'Inter',sans-serif", fontSize: 12, color: T.txtMid,
+                        cursor: 'pointer', transition: 'all 0.15s',
+                      }}
+                        onMouseEnter={e => { e.target.style.background = T.blueLt; e.target.style.borderColor = T.blue; e.target.style.color = T.blue; }}
+                        onMouseLeave={e => { e.target.style.background = T.bgMuted; e.target.style.borderColor = T.border; e.target.style.color = T.txtMid; }}
+                      >{s}</button>
+                    ))}
+                  </div>
+                )}
+
+                {/* input row */}
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <input
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && sendChat()}
+                    placeholder="Ask anything about the match..."
+                    disabled={chatLoading}
+                    style={{
+                      flex: 1, padding: '12px 16px', borderRadius: 10,
+                      border: `1.5px solid ${chatLoading ? T.border : T.borderMd}`,
+                      background: chatLoading ? T.bgMuted : T.bgCard,
+                      fontFamily: "'Inter',sans-serif", fontSize: 14, color: T.txtDark,
+                      outline: 'none', transition: 'border-color 0.2s',
+                    }}
+                    onFocus={e => e.target.style.borderColor = T.blue}
+                    onBlur={e => e.target.style.borderColor = T.borderMd}
+                  />
+                  <button
+                    onClick={() => sendChat()}
+                    disabled={chatLoading || !chatInput.trim()}
+                    style={{
+                      padding: '12px 22px', borderRadius: 10, border: 'none',
+                      background: chatLoading || !chatInput.trim() ? T.border : `linear-gradient(135deg, ${T.blue}, ${T.purple})`,
+                      color: chatLoading || !chatInput.trim() ? T.txtMute : '#fff',
+                      fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: 1,
+                      cursor: chatLoading || !chatInput.trim() ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 8,
+                    }}
+                  >
+                    {chatLoading
+                      ? <svg style={{ animation: 'spin 1s linear infinite', width: 16, height: 16 }} viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke={T.blue} strokeWidth="2" strokeOpacity="0.3" /><path d="M12 2a10 10 0 0 1 10 10" stroke={T.blue} strokeWidth="2" strokeLinecap="round" /></svg>
+                      : '→ ASK'
+                    }
+                  </button>
+                </div>
+              </div>
+            </div>
           </>
         )}
       </main>

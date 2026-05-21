@@ -121,4 +121,43 @@ router.post('/scan-image', async (req, res) => {
   }
 });
 
+// POST /api/chat — fan asks a free-form question about the live match
+router.post('/chat', async (req, res) => {
+  const { question } = req.body;
+  if (!question?.trim()) return res.status(400).json({ success: false, error: 'question required' });
+
+  let matchState;
+  try {
+    matchState = readLiveScore();
+  } catch (err) {
+    return res.status(500).json({ success: false, error: 'Cannot read livescore.json' });
+  }
+
+  const prompt = `You are CricMind, an elite cricket tactical analyst with the energy of a top IPL broadcast commentator.
+
+A fan is watching the live match and has a question. Answer in 2-3 sentences max:
+- Be specific — use the ACTUAL numbers from the match data provided
+- Keep energy high, like you are live on air
+- Never invent stats not present in the data
+- If asking about prediction, give a direct, honest read based on the numbers
+
+LIVE MATCH STATE:
+${JSON.stringify(matchState, null, 2)}
+
+FAN ASKS: ${question.trim()}`;
+
+  try {
+    const ai = getAI();
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: { temperature: 0.8 }
+    });
+    return res.json({ answer: response.text.trim(), success: true });
+  } catch (err) {
+    console.error('Chat error:', err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 export default router;

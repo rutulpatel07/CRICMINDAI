@@ -59,6 +59,8 @@
     }
   },
   "currentBatsmen": {
+    "totalPartnershipRuns": 12,
+    "ballsTotal": 9,
     "striker": {
       "playerName": "Shivam Dube",
       "runs": 8,
@@ -76,14 +78,40 @@
       "strikeRate": 100.00
     }
   },
+  "recentDismissals": [
+    {
+      "playerName": "MS Dhoni",
+      "runs": 5,
+      "ballsFaced": 4,
+      "dismissalType": "Caught",
+      "bowler": "Rashid Khan",
+      "over": 7.4
+    },
+    {
+      "playerName": "Ajinkya Rahane",
+      "runs": 22,
+      "ballsFaced": 18,
+      "dismissalType": "Caught",
+      "bowler": "Mohammed Siraj",
+      "over": 6.1
+    },
+    {
+      "playerName": "Rachin Ravindra",
+      "runs": 12,
+      "ballsFaced": 9,
+      "dismissalType": "Bowled",
+      "bowler": "Mohammed Siraj",
+      "over": 4.5
+    }
+  ],
   "bowlingStatus": {
     "currentBowler": {
       "playerName": "Jason Holder",
       "overs": 1.0,
       "maidens": 0,
-      "runsGiven": 9,
+      "runsGiven": 12,
       "wickets": 0,
-      "economyRate": 9.00
+      "economyRate": 12.00
     },
     "previousBowler": {
       "playerName": "Arshad Khan",
@@ -94,8 +122,74 @@
       "economyRate": 5.00
     }
   },
-  "gtBowlingFigures": {
-    "mohammedSiraj": { "overs": 3.0, "runs": 26, "wickets": 3, "economy": 8.67 },
-    "kagisoRabada": { "overs": 3.0, "runs": 32, "wickets": 1, "economy": 10.67 }
+  "bowlingCard": {
+    "mohammedSiraj": {
+      "overs": 2.0,
+      "runs": 19,
+      "wickets": 3,
+      "economy": 9.50
+    },
+    "kagisoRabada": {
+      "overs": 2.0,
+      "runs": 22,
+      "wickets": 1,
+      "economy": 11.00
+    },
+    "rashidKhan": {
+      "overs": 2.0,
+      "runs": 14,
+      "wickets": 1,
+      "economy": 7.00
+    },
+    "arshadKhan": {
+      "overs": 1.0,
+      "runs": 5,
+      "wickets": 0,
+      "economy": 5.00
+    },
+    "jasonHolder": {
+      "overs": 1.0,
+      "runs": 12,
+      "wickets": 0,
+      "economy": 12.00
+    }
+  },
+  "playingXIs": {
+    "gujaratTitans": {
+      "captain": "Shubman Gill",
+      "wicketKeeper": "Jos Buttler",
+      "impactPlayer": "Jason Holder",
+      "players": [
+        "Shubman Gill",
+        "Jos Buttler",
+        "Sai Sudharsan",
+        "Hardik Pandya",
+        "David Miller",
+        "Rahul Tewatia",
+        "Rashid Khan",
+        "Arshad Khan",
+        "Jason Holder",
+        "Kagiso Rabada",
+        "Mohammed Siraj"
+      ]
+    },
+    "chennaiSuperKings": {
+      "captain": "Ruturaj Gaikwad",
+      "wicketKeeper": "MS Dhoni",
+      "impactPlayer": "Noor Ahmad",
+      "players": [
+        "Ruturaj Gaikwad",
+        "Devon Conway",
+        "Rachin Ravindra",
+        "Ajinkya Rahane",
+        "Dewald Brevis",
+        "Shivam Dube",
+        "MS Dhoni",
+        "Ravindra Jadeja",
+        "Deepak Chahar",
+        "Noor Ahmad",
+        "Matheesha Pathirana"
+      ]
+    }
   }
 }
