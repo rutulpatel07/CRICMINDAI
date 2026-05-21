@@ -488,41 +488,24 @@ export default function Dashboard() {
   });
 
   const triggerScan = async () => {
-    // #region agent log
-    fetch('http://127.0.0.1:7671/ingest/8f0dd215-8f51-419c-a788-1caa5b241e4f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4911be'},body:JSON.stringify({sessionId:'4911be',location:'Dashboard.jsx:triggerScan-entry',message:'triggerScan called',data:{loading,aiInsights:!!aiInsights},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-    // #endregion
     setLoading(true); setAiInsights(null); setDataSource(null);
     try {
       // Run animation and API call in parallel — whichever finishes first waits for the other
       const apiCall = fetch('http://localhost:5000/api/scan', { method: 'POST' })
         .then(r => r.json())
-        .catch((fetchErr) => {
-          // #region agent log
-          fetch('http://127.0.0.1:7671/ingest/8f0dd215-8f51-419c-a788-1caa5b241e4f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4911be'},body:JSON.stringify({sessionId:'4911be',location:'Dashboard.jsx:apiCall-catch',message:'fetch/json error',data:{error:String(fetchErr)},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-          // #endregion
-          return null;
-        });
+        .catch(() => null);
       await Promise.all([runConsole(), new Promise(r => setTimeout(r, 3400))]);
       let json = await apiCall;
-      // #region agent log
-      fetch('http://127.0.0.1:7671/ingest/8f0dd215-8f51-419c-a788-1caa5b241e4f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4911be'},body:JSON.stringify({sessionId:'4911be',location:'Dashboard.jsx:after-apiCall',message:'api response received',data:{json_null:json===null,success:json?.success,has_insights:!!json?.insights,insights_type:typeof json?.insights,insights_keys:json?.insights?Object.keys(json.insights):null,dataSource:json?.dataSource},timestamp:Date.now(),hypothesisId:'H2 H3 H4'})}).catch(()=>{});
-      // #endregion
       let result;
       if (!json || json.success === false) {
         result = { insights: FALLBACK_INSIGHTS, dataSource: 'local_mock' };
       } else {
         result = json;
       }
-      // #region agent log
-      fetch('http://127.0.0.1:7671/ingest/8f0dd215-8f51-419c-a788-1caa5b241e4f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4911be'},body:JSON.stringify({sessionId:'4911be',location:'Dashboard.jsx:before-setAiInsights',message:'about to set aiInsights',data:{dataSource:result.dataSource,momentumType:typeof result.insights?.momentumShift,tacticalType:typeof result.insights?.tacticalAdvice,hypeType:typeof result.insights?.hypeCommentary,momentumValue:String(result.insights?.momentumShift).slice(0,80)},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
-      // #endregion
       setConsoleLogs(p => [...p, result.dataSource === 'local_mock' ? '[FAIL-SAFE] Using local fallback insights.' : '[LIVE] Gemini analysis complete.']);
       setAiInsights(result.insights);
       setDataSource(result.dataSource);
     } catch (e) {
-      // #region agent log
-      fetch('http://127.0.0.1:7671/ingest/8f0dd215-8f51-419c-a788-1caa5b241e4f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4911be'},body:JSON.stringify({sessionId:'4911be',location:'Dashboard.jsx:triggerScan-catch',message:'caught error in triggerScan',data:{error:String(e),stack:e?.stack?.slice(0,300)},timestamp:Date.now(),hypothesisId:'H1 H5'})}).catch(()=>{});
-      // #endregion
       console.error('Scan error:', e);
       setAiInsights(FALLBACK_INSIGHTS);
       setDataSource('local_mock');
