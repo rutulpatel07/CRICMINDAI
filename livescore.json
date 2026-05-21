@@ -21,69 +21,81 @@
     },
     "matchStatus": "In Progress"
   },
+  "inningsSummary": {
+    "firstInnings": {
+      "battingTeam": "Gujarat Titans",
+      "totalScore": {
+        "runs": 229,
+        "wickets": 4,
+        "overs": 20.0
+      },
+      "topPerformers": [
+        { "playerName": "Sai Sudharsan", "runs": 84, "ballsFaced": 53, "fours": 7, "sixes": 4 },
+        { "playerName": "Shubman Gill", "runs": 64, "ballsFaced": 37, "fours": 7, "sixes": 3 },
+        { "playerName": "Jos Buttler", "runs": 57, "ballsFaced": 27, "fours": 5, "sixes": 4, "isNotOut": true }
+      ]
+    }
+  },
   "liveScore": {
-    "currentInnings": 1,
-    "battingTeam": "Gujarat Titans",
-    "bowlingTeam": "Chennai Super Kings",
+    "currentInnings": 2,
+    "battingTeam": "Chennai Super Kings",
+    "bowlingTeam": "Gujarat Titans",
     "score": {
-      "runs": 159,
-      "wickets": 1,
-      "overs": 15.0,
-      "balls": 90
+      "runs": 72,
+      "wickets": 5,
+      "overs": 8.0,
+      "balls": 48
     },
     "runRate": {
-      "current": 10.60,
-      "projectedScore": 212
+      "current": 9.00,
+      "required": 13.17
     },
+    "target": 230,
+    "runsNeeded": 158,
+    "oversRemaining": 12.0,
     "winProbability": {
-      "gujaratTitans": 71.4,
-      "chennaiSuperKings": 28.6
+      "gujaratTitans": 96.4,
+      "chennaiSuperKings": 3.6
     }
   },
   "currentBatsmen": {
     "striker": {
-      "playerName": "Jos Buttler",
-      "runs": 26,
-      "ballsFaced": 11,
+      "playerName": "Shivam Dube",
+      "runs": 8,
+      "ballsFaced": 5,
       "fours": 1,
-      "sixes": 3,
-      "strikeRate": 236.36
+      "sixes": 0,
+      "strikeRate": 160.00
     },
     "nonStriker": {
-      "playerName": "Sai Sudharsan",
-      "runs": 57,
-      "ballsFaced": 42,
-      "fours": 6,
-      "sixes": 1,
-      "strikeRate": 135.71
+      "playerName": "Dewald Brevis",
+      "runs": 4,
+      "ballsFaced": 4,
+      "fours": 0,
+      "sixes": 0,
+      "strikeRate": 100.00
     }
   },
-  "recentDismissals": [
-    {
-      "playerName": "Shubman Gill",
-      "runs": 72,
-      "ballsFaced": 37,
-      "dismissalType": "Caught",
-      "bowler": "Noor Ahmad",
-      "over": 12.4
-    }
-  ],
   "bowlingStatus": {
     "currentBowler": {
-      "playerName": "Mukesh Choudhary",
-      "overs": 3.0,
+      "playerName": "Jason Holder",
+      "overs": 1.0,
       "maidens": 0,
-      "runsGiven": 23,
+      "runsGiven": 9,
       "wickets": 0,
-      "economyRate": 7.67
+      "economyRate": 9.00
     },
     "previousBowler": {
-      "playerName": "Noor Ahmad",
-      "overs": 3.0,
+      "playerName": "Arshad Khan",
+      "overs": 1.0,
       "maidens": 0,
-      "runsGiven": 41,
-      "wickets": 1,
-      "economyRate": 13.67
+      "runsGiven": 5,
+      "wickets": 0,
+      "economyRate": 5.00
     }
+  },
+  "gtBowlingFigures": {
+    "mohammedSiraj": { "overs": 3.0, "runs": 26, "wickets": 3, "economy": 8.67 },
+    "kagisoRabada": { "overs": 3.0, "runs": 32, "wickets": 1, "economy": 10.67 }
   }
 }

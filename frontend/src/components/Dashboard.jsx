@@ -795,7 +795,7 @@ export default function Dashboard() {
           <>
             {/* Tier 1 panels */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 16 }}>
-              <PlainEnglish score={score} runRate={rr} partnership={d?.currentPartnership} innings={innings} />
+              <PlainEnglish score={score} runRate={rr} partnership={batsmen} innings={innings} />
               <PressureMeter score={score} runRate={rr} />
               <MilestoneTracker striker={striker} nonStriker={nonStr} score={score} />
             </div>
